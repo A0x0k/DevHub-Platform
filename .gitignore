@@ -157,3 +157,6 @@ cython_debug/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Node modules
+node_modules/

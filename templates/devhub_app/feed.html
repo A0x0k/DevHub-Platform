@@ -15,42 +15,57 @@
                     <h1 class="text-4xl font-black tracking-tight">Community Feed</h1>
                 </div>
                 <div class="flex items-center gap-4 w-full sm:w-auto">
-                    <div class="relative flex-grow sm:w-56">
+                    <form method="get" action="{% url 'devhub_app:feed' %}" class="relative flex-grow sm:w-56">
                         <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
                         <input type="text" 
+                               name="q"
+                               value="{{ search_query }}"
                                placeholder="Search posts..." 
-                               onkeyup="window.filterItems(this.value, 'feed-container')"
-                               class="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-coral transition-all">
-                    </div>
-                    <a href="{% url 'devhub_app:post-create' %}" class="px-5 py-2.5 rounded-xl bg-mint text-ink font-bold shadow-lg shadow-mint/10 hover:scale-105 transition-all">
+                               class="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-coral transition-all"
+                               aria-label="Search posts">
+                        {% if search_query %}
+                        <a href="{% url 'devhub_app:feed' %}" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white" aria-label="Clear search">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </a>
+                        {% endif %}
+                    </form>
+                    <a href="{% url 'devhub_app:post-create' %}" class="px-5 py-2.5 rounded-xl bg-mint text-ink font-bold shadow-lg shadow-mint/10 hover:scale-105 transition-all" aria-label="Create new post">
                         Post
                     </a>
                 </div>
             </div>
 
+            {% if search_query %}
+            <div class="flex items-center gap-2 text-sm text-slate-400 animate-in">
+                <span>Showing results for</span>
+                <span class="font-bold text-coral">"{{ search_query }}"</span>
+                <span>({{ page_obj.paginator.count }} post{{ page_obj.paginator.count|pluralize }})</span>
+            </div>
+            {% endif %}
+
             <!-- Feed Container -->
             <div id="feed-container" class="space-y-6">
-                {% for post in posts %}
+                {% for post in page_obj %}
                 <article class="glass-card rounded-[2rem] p-6 md:p-8 group animate-in stagger-{{ forloop.counter }}" data-filter-item data-filter-text="{{ post.title }} {{ post.content }} {{ post.author.username }}">
                     <div class="flex items-start justify-between gap-4 mb-5">
                         <div class="flex items-center gap-4">
                             <div class="w-11 h-11 rounded-xl bg-white/5 p-0.5 border border-white/5 flex-shrink-0">
-                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ post.author.profile.avatar_seed }}" alt="Avatar" class="w-full h-full object-cover rounded-lg">
+                                <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ post.author.profile.avatar_seed }}" alt="{{ post.author.username }}'s avatar" class="w-full h-full object-cover rounded-lg">
                             </div>
                             <div>
                                 <h2 class="text-xl font-black group-hover:text-coral transition-colors">{{ post.title }}</h2>
                                 <div class="flex items-center gap-2 text-slate-500 text-xs mt-0.5">
                                     <span class="font-bold text-slate-300">{{ post.author.get_full_name|default:post.author.username }}</span>
-                                    <span>•</span>
-                                    <span>{{ post.created_at|date:"M d, Y" }} at {{ post.created_at|date:"H:i" }}</span>
+                                    <span aria-hidden="true">&bull;</span>
+                                    <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"M d, Y" }} at {{ post.created_at|date:"H:i" }}</time>
                                 </div>
                             </div>
                         </div>
                         <div class="flex gap-2 flex-shrink-0">
-                            <a href="{% url 'devhub_app:post-edit' post.pk %}" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors" data-tooltip="Edit">
+                            <a href="{% url 'devhub_app:post-edit' post.pk %}" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors" data-tooltip="Edit" aria-label="Edit post: {{ post.title }}">
                                 <i data-lucide="edit" class="w-4 h-4 text-slate-400"></i>
                             </a>
-                            <a href="{% url 'devhub_app:post-delete' post.pk %}" class="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 transition-colors" data-tooltip="Delete">
+                            <a href="{% url 'devhub_app:post-delete' post.pk %}" class="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 transition-colors" data-tooltip="Delete" aria-label="Delete post: {{ post.title }}">
                                 <i data-lucide="trash-2" class="w-4 h-4 text-red-400/70"></i>
                             </a>
                         </div>
@@ -63,26 +78,80 @@
                     <div class="flex items-center justify-between pt-5 border-t border-white/5">
                         <div class="flex items-center gap-5">
                             {% include "devhub_app/partials/post_likes.html" %}
-                            <div class="flex items-center gap-1.5 text-sm font-bold text-slate-400">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            <div class="flex items-center gap-1.5 text-sm font-bold text-slate-400" aria-label="{{ post.metrics.views }} views">
+                                <i data-lucide="eye" class="w-4 h-4" aria-hidden="true"></i>
                                 <span>{{ post.metrics.views }}</span>
                             </div>
-                            <button class="flex items-center gap-1.5 text-sm font-bold text-slate-400 hover:text-mint transition-colors">
-                                <i data-lucide="share-2" class="w-4 h-4"></i>
-                                <span>Share</span>
-                            </button>
                         </div>
                         
                         <div class="hidden sm:flex items-center gap-2 text-2xs uppercase tracking-widest font-black text-slate-600">
-                            <i data-lucide="hash" class="w-3 h-3"></i>
+                            <i data-lucide="hash" class="w-3 h-3" aria-hidden="true"></i>
                             <span>post-{{ post.id }}</span>
                         </div>
                     </div>
                 </article>
                 {% empty %}
+                {% if search_query %}
+                <div class="glass-card rounded-[2rem] p-12 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="search-x" class="w-8 h-8 text-slate-500"></i>
+                    </div>
+                    <h3 class="text-xl font-black mb-2">No posts found</h3>
+                    <p class="text-slate-400 mb-6">No posts match "{{ search_query }}". Try a different search term.</p>
+                    <a href="{% url 'devhub_app:feed' %}" class="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold transition-all">Clear Search</a>
+                </div>
+                {% else %}
                 {% include "devhub_app/components/empty_state.html" with icon="message-square" title="Quiet in here..." description="Your feed is waiting for its first spark. Share an update, a breakthrough, or just a thought." action_url="/posts/new/" action_text="Publish First Post" action_icon="pen-tool" %}
+                {% endif %}
                 {% endfor %}
             </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav class="flex items-center justify-center gap-2 animate-in" aria-label="Feed pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" 
+                   class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold transition-all"
+                   aria-label="Previous page">
+                    <i data-lucide="chevron-left" class="w-4 h-4 inline-block"></i> Prev
+                </a>
+                {% else %}
+                <span class="px-4 py-2 rounded-xl bg-white/5 text-sm font-bold text-slate-600 cursor-not-allowed">
+                    <i data-lucide="chevron-left" class="w-4 h-4 inline-block"></i> Prev
+                </span>
+                {% endif %}
+
+                <div class="flex items-center gap-1">
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <span class="w-10 h-10 rounded-xl bg-mint text-ink text-sm font-black flex items-center justify-center" aria-current="page">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}" 
+                           class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold flex items-center justify-center transition-all"
+                           aria-label="Page {{ num }}">{{ num }}</a>
+                        {% elif num == 1 or num == page_obj.paginator.num_pages %}
+                        <a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}" 
+                           class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold flex items-center justify-center transition-all"
+                           aria-label="Page {{ num }}">{{ num }}</a>
+                        {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+                        <span class="w-10 h-10 flex items-center justify-center text-slate-600">&hellip;</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" 
+                   class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold transition-all"
+                   aria-label="Next page">
+                    Next <i data-lucide="chevron-right" class="w-4 h-4 inline-block"></i>
+                </a>
+                {% else %}
+                <span class="px-4 py-2 rounded-xl bg-white/5 text-sm font-bold text-slate-600 cursor-not-allowed">
+                    Next <i data-lucide="chevron-right" class="w-4 h-4 inline-block"></i>
+                </span>
+                {% endif %}
+            </nav>
+            {% endif %}
         </div>
 
         <!-- Sidebar -->
@@ -90,7 +159,7 @@
             <!-- Profile Card -->
             <div class="glass-card rounded-[2rem] p-6 text-center">
                 <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 p-1 mx-auto mb-4">
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ user.profile.avatar_seed }}" alt="Avatar" class="w-full h-full object-cover rounded-xl">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ user.profile.avatar_seed }}" alt="{{ user.username }}'s avatar" class="w-full h-full object-cover rounded-xl">
                 </div>
                 <h3 class="font-black">{{ user.get_full_name|default:user.username }}</h3>
                 <p class="text-xs text-slate-500 mb-4">{{ user.profile.headline }}</p>
@@ -100,36 +169,17 @@
                 </div>
             </div>
 
-            <!-- Trending Tags -->
-            <div class="glass-card rounded-[2rem] p-6">
-                <h3 class="text-2xs uppercase tracking-[0.2em] font-black text-slate-500 mb-4">Trending Topics</h3>
-                <div class="flex flex-wrap gap-2">
-                    <span class="badge badge-mint">#python</span>
-                    <span class="badge badge-coral">#django</span>
-                    <span class="badge badge-blue">#react</span>
-                    <span class="badge badge-purple">#rust</span>
-                    <span class="badge badge-amber">#devops</span>
-                    <span class="badge badge-mint">#ai</span>
-                    <span class="badge badge-coral">#tailwind</span>
-                    <span class="badge badge-blue">#postgres</span>
-                </div>
-            </div>
-
             <!-- Quick Stats -->
             <div class="glass-card rounded-[2rem] p-6">
                 <h3 class="text-2xs uppercase tracking-[0.2em] font-black text-slate-500 mb-4">This Week</h3>
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-slate-400">Posts published</span>
-                        <span class="font-black text-mint">3</span>
+                        <span class="font-black text-mint">{{ posts.count }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-slate-400">Total views</span>
-                        <span class="font-black text-mint">142</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-slate-400">Likes received</span>
-                        <span class="font-black text-coral">12</span>
+                        <span class="font-black text-mint">{{ total_post_views }}</span>
                     </div>
                 </div>
             </div>
