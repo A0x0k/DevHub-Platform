@@ -14,7 +14,7 @@ We take the security of DevHub Platform seriously. If you believe you have found
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please send an email to the repository owner at [neoastra303@users.noreply.github.com](mailto:neoastra303@users.noreply.github.com).
+Instead, please send an email to the repository owner at [A0x0k@users.noreply.github.com](mailto:A0x0k@users.noreply.github.com).
 
 Please include:
 - A description of the vulnerability.

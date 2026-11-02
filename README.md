@@ -1,6 +1,6 @@
 # DevHub Platform | Your Dev Life, Optimized.
 
-[![CI](https://github.com/neoastra303/DevHub_Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/neoastra303/DevHub_Platform/actions)
+[![CI](https://github.com/A0x0k/DevHub-Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/A0x0k/DevHub-Platform/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python: 3.13](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/downloads/release/python-3130/)
 [![Django: 6.0](https://img.shields.io/badge/Django-6.0-green.svg)](https://docs.djangoproject.com/en/6.0/)
@@ -15,7 +15,7 @@ DevHub is more than a dashboard; it’s the quiet, high-performance vault for yo
 
 Whether you're tracking intricate project dependencies or simply need a clean space to breathe and build, DevHub transforms the chaos of modern engineering into a calm, structured narrative.
 
-Created with heart by [neoastra303](https://github.com/neoastra303).
+Created with heart by [A0x0k](https://github.com/A0x0k).
 
 ---
 
@@ -65,6 +65,25 @@ Ready to experience a more organized dev life?
 docker-compose up --build
 ```
 Your new workspace will be waiting for you at `http://localhost:8000`.
+
+### Manual Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/A0x0k/DevHub-Platform.git
+   cd DevHub-Platform
+   ```
+2. Create a virtual environment and install dependencies:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+3. Run migrations and start the server:
+   ```bash
+   python manage.py migrate
+   python manage.py runserver
+   ```
 
 ### API Documentation
 Dive into the technical specs:

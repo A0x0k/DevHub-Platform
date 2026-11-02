@@ -2,7 +2,7 @@
 name = "devhub-platform"
 version = "1.0.0"
 description = "Enterprise-grade developer workspace platform."
-authors = [{ name = "neoastra303" }]
+authors = [{ name = "A0x0k" }]
 dependencies = [
     "Django>=6.0.6,<6.1",
     "djangorestframework>=3.17.1,<3.18",
